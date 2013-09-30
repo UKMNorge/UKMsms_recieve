@@ -1,5 +1,5 @@
 <?php
-//pushtest
+//synctestet
 require_once('UKM/sms.class.php');
 
 $PREFIX = explode(' ', $_GET['msg']);
