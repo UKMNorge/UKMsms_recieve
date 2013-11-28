@@ -1,8 +1,6 @@
 <?php
 
 require_once('UKM/sql.class.php');
-die('Mangler mailer')
-die('Mangler ny curl-klasse');
 
 function valider($fra, $sms) {
 	$info = explode(' ', $sms);
@@ -53,12 +51,17 @@ function valider_logg($bid, $kode) {
 }
 
 function valider_feilet($til, $bid, $melding) {
+	$SMS = new SMS('pameldingUKMvalidate', 0);
+	$SMS->text($melding)->to($til)->from('UKMNorge')->ok();
+
+/*
 	svevesms_sendSMS('ukm',
 					$melding,
 					$til,
 					'UKMNorge',
 					0,
 					'BandValidationFail');
+*/
 
 	$body = 'Innslaget '.$bid.' ble '.time().' fors&oslash;kt manuelt validert, uten suksess'
 			. '<br />'
@@ -71,16 +74,25 @@ function valider_feilet($til, $bid, $melding) {
 			. '<br /><br />'
 			.'Mvh, Valideringssystemet';
 	
-	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' FEILET!', $body);
+	$mail = new UKMmail();
+	$mail->text($body)->to('support@ukm.no')->subject('Validering av '. $bid .' FEILET')->ok();
+//	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' FEILET!', $body);
 }
 
 function valider_ok($til,$bid, $mail) {
+	$melding = 'Du kan nå fortsette din validering! Vi har sendt brukernavn og passord til '.$mail;
+
+	$SMS = new SMS('pameldingUKMvalidate', 0);
+	$SMS->text($melding)->to($til)->from('UKMNorge')->ok();
+
+/*
 	svevesms_sendSMS('ukm',
 					'Du kan nå fortsette din validering! Vi har sendt brukernavn og passord til '.$mail,
 					$til,
 					'UKMNorge',
 					0,
 					'BandValidationOK');
+*/
 	$body = 'Innslaget '.$bid.' fikk ikke SMS-kode fra p&aring;meldingssystemet, men '
 		  . 'har n&aring; blitt manuelt validert.'
 		  . '<br /><br />'
@@ -89,8 +101,9 @@ function valider_ok($til,$bid, $mail) {
 		  . 'Det er ikke tilfeldigvis en liten stund siden du fylte opp kaffekoppen?'
 		  . '<br /><br />'
 		  . 'Mvh, Valideringssystemet';
-		  
-	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' I ORDEN!', $body);
+	$mail = new UKMmail();
+	$mail->text($body)->to('support@ukm.no')->subject('Validering av '. $bid .' FEILET')->ok();
+//	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' I ORDEN!', $body);
 }
 
 function valider_really($bid, $fra) {
@@ -109,8 +122,15 @@ function valider_really($bid, $fra) {
 	$mail = $qry->run('field','p_email');
 
 	## SEND NYTT PASSORD
+/*
 	UKM_loader('curl');
 	curlURL('http://pamelding.ukm.no/?steg=dinside&email='.$mail);
+*/
+	require_once('UKM/curl.class.php');
+	$curl = new UKMCURL();
+	$curl->timeout(10);
+	$curl->request('http://pamelding.ukm.no/?steg=dinside&email='.$mail);
+	
 	valider_logg($bid, 29);
 	
 	## VALIDER INNSLAGET OG VARSLE SUPPORT
@@ -122,6 +142,6 @@ function valider_really($bid, $fra) {
 	$opp->run();
 }
 
-		valider($number, $message);
+valider($number, $message);
 
 ?>
