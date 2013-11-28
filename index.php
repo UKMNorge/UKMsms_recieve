@@ -4,6 +4,7 @@ require_once('UKM/sms.class.php');
 
 $PREFIX = explode(' ', $_GET['msg']);
 $PREFIX = strtolower($PREFIX[0]);
+$MESSAGE = substr( $_GET['msg'], strlen( $PREFIX ) );
 $NUMBER = $_GET['number'];
 
 
