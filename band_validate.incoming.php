@@ -146,6 +146,6 @@ function valider_really($bid, $fra) {
 	$opp->run();
 }
 
-valider($number, $message);
+valider($NUMBER, $MESSAGE);
 
 ?>
