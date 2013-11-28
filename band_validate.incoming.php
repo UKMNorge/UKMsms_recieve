@@ -1,6 +1,8 @@
 <?php
 
 require_once('UKM/sql.class.php');
+require_once('UKM/sql.class.php');
+require_once('UKM/mail.class.php');
 
 function valider($fra, $sms) {
 	$info = explode(' ', $sms);
