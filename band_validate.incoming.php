@@ -55,9 +55,6 @@ function valider_logg($bid, $kode) {
 function valider_feilet($til, $bid, $melding) {
 	$SMS = new SMS('pameldingUKMvalidate', 0);
 	$SMS->text($melding)->to($til)->from('UKMNorge')->ok();
-
-	var_dump( $SMS );
-
 /*
 	svevesms_sendSMS('ukm',
 					$melding,
