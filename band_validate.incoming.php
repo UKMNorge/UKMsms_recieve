@@ -64,17 +64,28 @@ function valider_feilet($til, $bid, $melding) {
 					'BandValidationFail');
 */
 
-	$body = 'Innslaget '.$bid.' ble '.time().' fors&oslash;kt manuelt validert, uten suksess'
-			. '<br />'
-			.'Om du ikke i l&oslash;pet av kort tid mottar en ny e-post med suksess-melding, betyr det at '
-			.'dette innslaget ikke blir p&aring;meldt, og fortjener en oppf&oslash;lging.'
-			.'<br /><br />'
-			.'Kontaktpersonen fikk f&oslash;lgende melding:'
-			.'<br />'
-			. $melding
-			. '<br /><br />'
-			.'Mvh, Valideringssystemet';
-	
+	$body = '<h1>Manuell SMS-validering feilet også for B-ID:'. $_SESSION['b_id'].'</h1>
+			<p>
+				Dette betyr at kontaktpersonen har sendt SMS til 1963 som forespurt, 
+				men har gjort dette feil (feil kodeord, sendt fra feil telefonnummer e.l.)
+			</p>
+			<p>
+				Kontaktpersonen har fått info om feil, og har muligheten til å prøve igjen. 
+				Du kan derfor få en ny e-post om kort tid.
+			</p>
+			<h3>Hvis det IKKE kommer en e-post i løpet av kort tid...</h3>
+			<p>
+				..må innslaget manuelt godkjennes (se første e-post)
+			</p>
+			<p>
+				Kontaktpersonen fikk f&oslash;lgende melding:
+				<br />
+				'. $melding .'
+			</p>
+			<p>
+				Mvh, Valideringssystemet
+			</p>'
+			;	
 	$mail = new UKMmail();
 	$mail->text($body)->to('support@ukm.no')->subject('Validering av '. $bid .' FEILET')->ok();
 //	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' FEILET!', $body);
@@ -94,14 +105,17 @@ function valider_ok($til,$bid, $mail) {
 					0,
 					'BandValidationOK');
 */
-	$body = 'Innslaget '.$bid.' fikk ikke SMS-kode fra p&aring;meldingssystemet, men '
-		  . 'har n&aring; blitt manuelt validert.'
-		  . '<br /><br />'
-		  . '<strong>DET ER INGEN GRUNN TIL PANIKK!</strong>'
- 		  .'<br />'
-		  . 'Det er ikke tilfeldigvis en liten stund siden du fylte opp kaffekoppen?'
-		  . '<br /><br />'
-		  . 'Mvh, Valideringssystemet';
+	$body = '<h1>Manuell SMS-validering <u>GIKK I ORDEN!</u> B-ID:'. $_SESSION['b_id'].'</h1>
+			<p>
+				<strong>DET ER INGEN GRUNN TIL PANIKK!</strong>
+			</p>
+			<p>
+				Det betyr at du kan flytte denne e-posttråden over til besvarte e-post og kanskje fylle opp kaffekoppen?
+			</p>
+			<p>
+				Mvh, Valideringssystemet
+			</p>'
+			;
 	$mail = new UKMmail();
 	$mail->text($body)->to('support@ukm.no')->subject('Validering av '. $bid .' FEILET')->ok();
 //	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' I ORDEN!', $body);
