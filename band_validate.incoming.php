@@ -64,7 +64,7 @@ function valider_feilet($til, $bid, $melding) {
 					'BandValidationFail');
 */
 
-	$body = '<h1>Manuell SMS-validering feilet også for B-ID:'. $_SESSION['b_id'].'</h1>
+	$body = '<h1>Manuell SMS-validering feilet også for B-ID:'. $bid.'</h1>
 			<p>
 				Dette betyr at kontaktpersonen har sendt SMS til 1963 som forespurt, 
 				men har gjort dette feil (feil kodeord, sendt fra feil telefonnummer e.l.)
@@ -92,7 +92,7 @@ function valider_feilet($til, $bid, $melding) {
 }
 
 function valider_ok($til,$bid, $mail) {
-	$melding = 'Du kan nå fortsette din validering! Vi har sendt brukernavn og passord til '.$mail;
+	$melding = 'Du kan nå fortsette din påmelding! Vi har sendt brukernavn og passord til '.$mail;
 
 	$SMS = new SMS('pameldingUKMvalidate', 0);
 	$SMS->text($melding)->to($til)->from('UKMNorge')->ok();
@@ -105,7 +105,7 @@ function valider_ok($til,$bid, $mail) {
 					0,
 					'BandValidationOK');
 */
-	$body = '<h1>Manuell SMS-validering <u>GIKK I ORDEN!</u> B-ID:'. $_SESSION['b_id'].'</h1>
+	$body = '<h1>Manuell SMS-validering <u>GIKK I ORDEN!</u> B-ID:'. $bid.'</h1>
 			<p>
 				<strong>DET ER INGEN GRUNN TIL PANIKK!</strong>
 			</p>
