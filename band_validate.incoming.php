@@ -19,7 +19,7 @@ function valider($fra, $sms) {
 	$avsender = $qry->run('field','v_phone');
 	if($avsender != $fra) {
 		valider_logg($bid, 36);
-		valider_feilet($fra,$bid, 'Beklager, kunne ikke validere påmeldingen. Du må sende SMS\'en fra '.$fra);
+		valider_feilet($fra,$bid, 'Beklager, kunne ikke validere påmeldingen. Du må sende SMS\'en fra '.$avsender);
 		die();
 	}
 	
