@@ -87,7 +87,7 @@ function valider_feilet($til, $bid, $melding) {
 			</p>'
 			;	
 	$mail = new UKMmail();
-	$mail->text($body)->to('support@ukm.no')->subject('Validering av '. $bid .' FEILET')->ok();
+	$mail->text($body)->to('support@ukm.no')->subject('SMS-validering B-ID: '. $bid)->ok();
 //	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' FEILET!', $body);
 }
 
@@ -117,7 +117,7 @@ function valider_ok($til,$bid, $mail) {
 			</p>'
 			;
 	$mail = new UKMmail();
-	$mail->text($body)->to('support@ukm.no')->subject('Validering av '. $bid .' FEILET')->ok();
+	$mail->text($body)->to('support@ukm.no')->subject('SMS-validering B-ID: '. $bid)->ok();
 //	sendUKMmail('support@ukm.no', 'Validering av '.$bid.' I ORDEN!', $body);
 }
 
