@@ -34,7 +34,7 @@ switch($PREFIX) {
 		require_once('nummerkorrigering.incoming.php');
 		die();
     
-    case 'ukmtips':
+    case 'tips':
         require_once('ukmtips.incoming.php');
         die();
 
