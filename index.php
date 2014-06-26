@@ -45,7 +45,7 @@ switch($PREFIX) {
 			->to($NUMBER)
 			->from('UKMNorge')
 			->ok();
-		die();
+		die('default die');
 
 /*
 	case 'nettred':
