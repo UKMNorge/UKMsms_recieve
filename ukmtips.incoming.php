@@ -9,3 +9,12 @@ svevesms_sendSMS(
     0,
     'ukmtips'
 );
+
+svevesms_sendSMS(
+    'ukm',
+    'Takk for ditt tips!',
+    $number,
+    'UKMNorge',
+    0,
+    'ukmtips2'
+);
