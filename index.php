@@ -33,6 +33,10 @@ switch($PREFIX) {
 	case 'riktig':
 		require_once('nummerkorrigering.incoming.php');
 		die();
+    
+    case 'ukmtips':
+        require_once('ukmtips.incoming.php');
+        die();
 
 	## FANT IKKE KODEORDET, SVAR DETTE	
 	default:
