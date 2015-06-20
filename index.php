@@ -33,7 +33,13 @@ switch($PREFIX) {
 	case 'riktig':
 		require_once('nummerkorrigering.incoming.php');
 		die();
-    
+		
+	case 'vits':
+		$headers = 'From: vitsmaster@ukm.no' . "\r\n" .
+    			   'Reply-To: vitsmaster@ukm.no' . "\r\n" .
+    			   'X-Mailer: PHP/' . phpversion();
+		mail('publikumskontakt@ukm-festivalen.no', 'UKM Festival Vits', 'Vits:' . "\n" . $MESSAGE . "\n\n" . 'Fra:' $NUMBER, $headers);
+    		die();
     case 'tips':
         require_once('ukmtips.incoming.php');
         die();
