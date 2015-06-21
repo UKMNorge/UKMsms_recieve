@@ -35,7 +35,7 @@ switch($PREFIX) {
 		die();
 		
 	case 'vits':
-		$SMS = new SMS('Ukm Vits','false');
+		$SMS = new SMS('UkmVits','false');
 		$SMS->text('Ditt bidrag til vitsekonkurransen er mottatt!')
 			->to($NUMBER)
 			->from('UKMNorge')
