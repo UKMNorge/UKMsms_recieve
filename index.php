@@ -34,13 +34,13 @@ switch($PREFIX) {
 		require_once('nummerkorrigering.incoming.php');
 		die();
 		
-	case 'vits':
+	/*case 'vits':
 		$SMS = new SMS('UkmVits','false');
 		$SMS->text('Ditt bidrag til vitsekonkurransen er mottatt!')
 			->to($NUMBER)
 			->from('UKMNorge')
 			->ok();
-    		die();
+    		die();*/
     case 'tips':
         require_once('ukmtips.incoming.php');
         die();
