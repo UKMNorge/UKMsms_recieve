@@ -7,6 +7,9 @@ $PREFIX = strtolower($PREFIX[0]);
 $MESSAGE = substr( $_GET['msg'], strlen( $PREFIX ) );
 $NUMBER = $_GET['number'];
 
+// var_dump($PREFIX);
+// var_dump($MESSAGE);
+// var_dump($NUMBER);
 
 switch($PREFIX) {
 	## REGISTRER SOM AMBASSADØR
@@ -19,7 +22,8 @@ switch($PREFIX) {
 		
 	## MANUELL VALIDERING AV INNSLAG
 	case 'v':
-		require_once('band_validate.incoming.php');
+		require_once('register_user.incoming.php');
+		// OLD!require_once('band_validate.incoming.php');
 		die();
 
 	## PÅMELDING TIL FESTIVAL-WORKSHOPS
