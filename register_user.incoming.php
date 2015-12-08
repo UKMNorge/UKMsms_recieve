@@ -8,9 +8,7 @@
 
 // Definer konstanter før include av SQL-klassen
 define('UKM_DB_NAME', 'ukmdelta_db');
-define('UKM_DB_USER', 'ukmdelta');
-// Passord burde bli definert i UKMconfig.inc.php, men vet ikke om det gjør det når DB_NAME er definert....
-// Se på dette, det gjør at den feiler!
+
 require_once('UKM/sql.class.php');
 
 
@@ -38,14 +36,20 @@ function validerBruker($msg, $nummer) {
 	$sql = new SQLins('SMSValidation', array('phone' => $nummer, 'user_id' => $msg));
 	$sql->add('validated', 1);
 
-	// echo $sql->debug();
+	//echo $sql->debug();
 	$res = $sql->run();
+	// var_dump($res);
 	if ($res == 1) {
 		// Done, everything okay.
 		// (1 affected row)
 		return;
 	}
+	if ($res == 0) {
+		// Ingen endringer
+		die('Allerede validert.');
+	}
 	else {
+		echo mysql_error().'<br>';
 		die('Something went wrong!');
 	}
 }

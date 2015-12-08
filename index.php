@@ -1,6 +1,5 @@
 <?php
 //synctestet
-require_once('UKM/sms.class.php');
 
 $PREFIX = explode(' ', $_GET['msg']);
 $PREFIX = strtolower($PREFIX[0]);
@@ -39,6 +38,7 @@ switch($PREFIX) {
 		die();
 		
 	case 'vits':
+		require_once('UKM/sms.class.php');
 		$SMS = new SMS('UkmVits','false');
 		$SMS->text('Ditt bidrag til vitsekonkurransen er mottatt!')
 			->to($NUMBER)
@@ -51,6 +51,7 @@ switch($PREFIX) {
 
 	## FANT IKKE KODEORDET, SVAR DETTE	
 	default:
+		require_once('UKM/sms.class.php');
 		$SMS = new SMS('IllegalPrefix','false');
 		$SMS->text('Beklager, kodeordet "'. $PREFIX .'" er ikke registrert i vårt system')
 			->to($NUMBER)
