@@ -7,6 +7,7 @@ $pass =   chr(rand(97,122))
 		. strtoupper(chr(rand(65,90)))
 		;
 require_once('UKM/sql.class.php');
+require_once('UKM/sms.class.php');
 
 $qry = new SQLins('ukm_ambassador_personal_invite', array('invite_phone'=>$NUMBER));
 $qry->add('invite_code', $pass);
