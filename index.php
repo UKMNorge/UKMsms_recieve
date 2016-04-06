@@ -50,6 +50,10 @@ switch($PREFIX) {
         require_once('ukmtips.incoming.php');
         die();
 	        
+	case 'sjekk':
+		require_once('sjekk.incoming.php');
+		die();
+
 	## FANT IKKE KODEORDET, SVAR DETTE	
 	default:
 		$SMS = new SMS('IllegalPrefix','false');
