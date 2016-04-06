@@ -10,6 +10,8 @@ $NUMBER = $_GET['number'];
 // var_dump($MESSAGE);
 // var_dump($NUMBER);
 
+require_once('UKM/sms.class.php');
+
 switch($PREFIX) {
 	## REGISTRER SOM AMBASSADØR
 	case 'amb':
@@ -38,20 +40,18 @@ switch($PREFIX) {
 		die();
 		
 	case 'vits':
-		require_once('UKM/sms.class.php');
 		$SMS = new SMS('UkmVits','false');
 		$SMS->text('Ditt bidrag til vitsekonkurransen er mottatt!')
 			->to($NUMBER)
 			->from('UKMNorge')
 			->ok();
     		die();
-    	case 'tips':
-	        require_once('ukmtips.incoming.php');
-	        die();
-
+	case 'tips':
+        require_once('ukmtips.incoming.php');
+        die();
+	        
 	## FANT IKKE KODEORDET, SVAR DETTE	
 	default:
-		require_once('UKM/sms.class.php');
 		$SMS = new SMS('IllegalPrefix','false');
 		$SMS->text('Beklager, kodeordet "'. $PREFIX .'" er ikke registrert i vårt system')
 			->to($NUMBER)
