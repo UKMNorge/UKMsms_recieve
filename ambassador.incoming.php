@@ -21,8 +21,7 @@ if(!$res) {
 	$SMS->text('Beklager, vi kunne ikke finne en invitasjon med ditt nummer..
 Hvis du vil være ambassadør, følg oss på facebook.com/UKMNorge og kanskje noe dukker opp :)');
 } else {
-	$SMS->text('En UKM-ambassadør forteller andre om UKM, og bidrar til at flere melder seg på. Du får en gratis T-skjorte og noen tips fra oss, men det viktigste verktøyet er deg selv og dine erfaringer! Det er ingen forpliktelser, men om du gjør en god jobb kan du vinne en gratistur til UKM-festivalen. 
-Registrer deg på: http://ukm.no/ambassador så er du i gang!');
+	$SMS->text('En UKM-ambassadør forteller andre om UKM, og bidrar til at flere melder seg på. Du får en gratis T-skjorte og noen tips fra oss, men det viktigste verktøyet er deg selv og dine erfaringer! Registrer deg på: http://ukm.no/ambassador så er du i gang!');
 }
 $SMS->ok();	
 die(true);
