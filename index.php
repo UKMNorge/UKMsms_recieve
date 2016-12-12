@@ -6,9 +6,12 @@ $PREFIX = strtolower($PREFIX[0]);
 $MESSAGE = substr( $_GET['msg'], strlen( $PREFIX ) );
 $NUMBER = $_GET['number'];
 
-// var_dump($PREFIX);
-// var_dump($MESSAGE);
-// var_dump($NUMBER);
+require_once('UKMconfig.inc.php');
+if( 'ukm.dev' == UKM_HOSTNAME ) {
+	#var_dump($PREFIX);
+	#var_dump($MESSAGE);
+	#var_dump($NUMBER);
+}
 
 require_once('UKM/sms.class.php');
 
@@ -19,6 +22,10 @@ switch($PREFIX) {
 	case 'ambassador':
 	case 'ambassadør':
 		require_once('ambassador.incoming.php');
+		die();
+
+	case 'hurra':
+		require_once('ambassador.fortsett.php');
 		die();
 		
 	## MANUELL VALIDERING AV INNSLAG
