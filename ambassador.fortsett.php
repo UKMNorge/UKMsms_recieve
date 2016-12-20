@@ -16,11 +16,13 @@ else {
 	$url = 'http://ambassador.ukm.no/fortsett/'.$NUMBER;	
 }
 
+error_log("Ambassadør-fortsett: Har mottatt UKM Hurra fra ".$NUMBER);
+
 $curl = new UKMCURL();
 $curl->headersOnly();
 $res = $curl->process($url);
 
-// Svar med SMS hvis vi er i 
+// Svar med SMS hvis vi er i prod
 if ( 'ukm.dev' != UKM_HOSTNAME ) {	
 	$svar = new SMS();
 	$svar->text("Takk! Du er nå registrert som UKM-ambassadør i ett år til.")
