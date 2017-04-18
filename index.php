@@ -63,11 +63,17 @@ switch($PREFIX) {
 
 	## FANT IKKE KODEORDET, SVAR DETTE	
 	default:
-		$SMS = new SMS('IllegalPrefix','false');
-		$SMS->text('Beklager, kodeordet "'. $PREFIX .'" er ikke registrert i vårt system')
+		if('ukm.dev' == UKM_HOSTNAME) {
+			echo 'Not sending SMS in dev mode - unknown keyword. ';
+		}
+		else {
+			$SMS = new SMS('IllegalPrefix','false');
+			$SMS->text('Beklager, kodeordet "'. $PREFIX .'" er ikke registrert i vårt system')
 			->to($NUMBER)
 			->from('UKMNorge')
-			->ok();
+			->ok();	
+			error_log("UKMsms: Ukjent kodeord.");
+		}
 		die('default die');
 
 /*

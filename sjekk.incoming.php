@@ -22,18 +22,24 @@ else {
 
 	if($res != 1) {
 		error_log('UKMSJEKK: Klarte ikke å lagre i databasen. Nr: '.$NUMBER);
+		if("ukm.dev" == UKM_HOSTNAME)
+			echo "UKMSJEKK: Klarte ikke å lagre i databasen.";
 		die();
 	}
 
 	$url = 'http://delta.ukm.no/sjekk/'.$NUMBER.'/'.$hash;
 }
 
-$SMS = new SMS('UKMsjekk', 'false');
-$SMS->text('Sjekk informasjonen vi har om deg her: '.$url)
-	->to($NUMBER)
-	->from('UKMNorge')
-	->ok();
-	die();
+if( 'ukm.dev' == UKM_HOSTNAME) {
+	echo 'Not sending SMS in dev mode - text is: "'."Sjekk informasjonen vi har om deg her: ".$url.'" to number '.$NUMBER.'.';
+} else {
+	$SMS = new SMS('UKMsjekk', 'false');
+	$SMS->text('Sjekk informasjonen vi har om deg her: '.$url)
+		->to($NUMBER)
+		->from('UKMNorge')
+		->ok();
+}
+die();
 /*
 $SMS = new SMS('UKMsjekk','false');
 $SMS->text('Vi har en feil i funksjonen. Du vil få en SMS fra oss så fort dette er i orden. Det skal være i orden senest torsdag 14.april')
