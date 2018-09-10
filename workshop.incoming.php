@@ -103,7 +103,7 @@ UKM RIKTIG Jens Jensen fra Hedmark',
 	#### HVIS DET IKKE ER LEDIGE PLASSER, GI FEILMELDING
 	$places = new SQL("SELECT `ws_id` FROM `ukmno_ws_rel` WHERE `ws_id` = '#ws';",
 					array('ws'=>$workshopID));
-	$places = mysql_num_rows($places->run());
+	$places = SQL::numRows($places->run());
 	if( ($workshop['plasser']-$places) <= 0) {
 		svevesms_sendSMS('ukm',
 					'Beklager, workshopen er full.
@@ -125,7 +125,7 @@ ukm.no/festivalen/workshops',
 							array('pam'=>$pam_id));
 	$pameldinger = $pameldinger->run();
 	$avmeldt = '';
-	while($r = mysql_fetch_assoc($pameldinger)) {
+	while($r = SQL::fetch($pameldinger)) {
 		if($r['ws_id'] == $workshopID) {
 			svevesms_sendSMS('ukm',
 						'Du er allerede påmeldt denne workshopen.

@@ -32,7 +32,7 @@ function valider($fra, $sms) {
 	$venter = $venter->run();
 	
 	## INGEN VENTER
-	if(mysql_num_rows($venter)==0||!$venter) {
+	if(SQL::numRows($venter)==0||!$venter) {
 		valider_logg($bid, 38);
 		valider_feilet($fra, $bid, 'Beklager, kan ikke finne noen innslag fra ditt nr som venter på validering');
 		die();
