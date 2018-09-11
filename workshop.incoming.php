@@ -70,7 +70,7 @@ UKM RIKTIG Jens Jensen fra Hedmark',
 	if(!$registrert) {
 		$insert = new SQLins('ukmno_ws_pameldte');
 		$insert->add('mobil',$nummer);
-		$insert->add('navn',utf8_encode($person['p_firstname'].' '.$person['p_lastname']));
+		$insert->add('navn',$person['p_firstname'].' '.$person['p_lastname']);
 		$insert->add('fylke',$person['p_email']);
 		$insert->run();
 		$pam_id = $insert->insid();
@@ -141,7 +141,7 @@ ukm.no/festivalen/workshops',
 		if($r['okt'] == $workshop['okt']) {
 			$del = new SQLdel('ukmno_ws_rel', array('pam_id'=>$pam_id, 'ws_id'=>$r['ws_id']));
 			$del->run();
-			$avmeldt = ' i stedet for "'.utf8_encode($r['navn']).'"';
+			$avmeldt = ' i stedet for "'.$r['navn'].'"';
 		}
 	}
 
@@ -162,8 +162,8 @@ ukm.no/festivalen/workshops',
 	$meldpa->run();
 
 	svevesms_sendSMS('ukm',
-					'Vi har nå registrert '.utf8_encode($person['p_firstname']).' '.utf8_encode($person['p_lastname'])
-					.' til "'.utf8_encode($workshop['navn']).'" i '.$workshop['dag'].''.$avmeldt.'
+					'Vi har nå registrert '.$person['p_firstname'].' '.$person['p_lastname']
+					.' til "'.$workshop['navn'].'" i '.$workshop['dag'].''.$avmeldt.'
 Noe feil? Se
 ukm.no/festivalen/workshops',
 					$nummer,
