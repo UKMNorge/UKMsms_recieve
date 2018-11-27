@@ -35,12 +35,12 @@ function validerBruker($msg, $nummer) {
 	$sql = new SQLins('SMSValidation', array('phone' => $nummer, 'user_id' => $msg), 'ukmdelta');
 	$sql->add('validated', 1);
 
-	//echo $sql->debug();
+	
 	$res = $sql->run();
-	// var_dump($res);
 	if ($res >= 1) {
 		// Done, everything okay.
 		// (1 or more affected row)
+		notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS som ble mottatt korrekt. Valideringen er godkjent i databasen. Steg 2 av 3.', $nummer);
 		return;
 	}
 	if ($res == 0) {
@@ -49,6 +49,7 @@ function validerBruker($msg, $nummer) {
 		$res = $sql->run('field', 'COUNT(*)');
 		if ($res > 0) {
 			// Do nothing, already validated.
+			notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS. Godkjenning feilet fordi den allerede er godkjent i databasen. Brukeren får IKKE SMS tilbake om denne feilen. Har brukeren glemt å trykke på knappen "Trykk her når du har sendt meldingen", eller sendt flere meldinger? Steg 2 av 3.', $nummer);
 			validate_log("Allerede validert (".$nummer.")!");
 			die('Allerede validert.');
 		}
@@ -57,18 +58,38 @@ function validerBruker($msg, $nummer) {
 			// Or reply to the user with an error
 			svar("Klarte ikke å godkjenne telefonnummeret - ta kontakt med support@ukm.no.", $nummer);
 			validate_log("Kunne ikke endre status til validert (".$nummer.")!");
+			notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS, men vi klarte ikke å endre status til godkjent i databasen. Brukeren har fått SMS om at det har skjedd en feil, og beskjed om å kontakte support. Steg 2 av 3.', $nummer);
 			die('Klarte ikke endre status.');
 		}
 	}
 	else {
 		#svar("Det oppsto en feil - ta kontakt med support@ukm.no", $nummer);
 		validate_log("Det oppsto en feil i MySQL for nummer ".$nummer.": ".$sql->error());
+		notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS, men vi traff på en ukjent feil mens vi prøvde å godkjenne brukeren. Brukeren har IKKE fått SMS om at det har skjedd en feil, og lokalkontakt bør kanskje kontaktes? Steg 2 av 3.', $nummer);
 		die('Something went wrong!');
 	}
 }
 
 function validate_log($message) {
 	error_log('UKMsms_recieve: SMSValidation: '. $message);
+}
+
+function notifySupport($message, $phone) {
+	// Send e-post til support om at brukeren godkjennes i Deltasystemet.
+	require_once('UKMconfig.inc.php');
+	require_once('UKM/mail.class.php');
+	$mail = new UKMmail();
+	$mail->
+		to("support@ukm.no")->
+		setFrom('delta@'.UKM_HOSTNAME, 'UKMdelta')->
+		subject('Manuell validering for '.$phone)->
+		message($message);
+	if('ukm.dev' == UKM_HOSTNAME) {
+		error_log("UKMsms: Not sending email in dev due to timeouts!");
+	} else {
+		error_log("UKMsms: Sending reverse sms notification email.");
+		$mail_result = $mail->ok();	
+	}
 }
 
 function svar($message, $number) {
