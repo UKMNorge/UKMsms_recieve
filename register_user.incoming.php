@@ -82,7 +82,7 @@ function notifySupport($message, $phone) {
 	$mail->
 		to("support@ukm.no")->
 		setFrom('delta@'.UKM_HOSTNAME, 'UKMdelta')->
-		subject('Manuell validering for '.$phone)->
+		subject('Re: Manuell validering for '.$phone)->
 		message($message);
 	if('ukm.dev' == UKM_HOSTNAME) {
 		error_log("UKMsms: Not sending email in dev due to timeouts!");
