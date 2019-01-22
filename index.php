@@ -15,6 +15,8 @@ if( 'ukm.dev' == UKM_HOSTNAME ) {
 
 require_once('UKM/sms.class.php');
 
+header('Cache-Control: no-store');
+
 switch($PREFIX) {
 	## REGISTRER SOM AMBASSADØR
 	case 'amb':
