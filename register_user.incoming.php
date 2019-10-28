@@ -9,65 +9,81 @@
 // Definer konstanter før include av SQL-klassen
 #define('UKM_DB_NAME', 'ukmdelta_db');
 
-require_once('UKM/sql.class.php');
+use UKMNorge\Database\SQL\Insert;
+use UKMNorge\Database\SQL\Query;
+
+ini_set('display_errors', true);
+
+require_once('UKMconfig.inc.php');
+require_once('UKM/Autoloader.php');
 
 // Entry point
-// Her er $MESSAGE og $NUMBER de interessante verdiene.
-validerBruker($MESSAGE, $NUMBER);
+// Sjekk at nummeret er et fullstendig telefonnummer
+if (!is_numeric($NUMBER) || (strlen($NUMBER) != 8)) {
+    // Systemfeil - logg og si fra til admins?
+    validate_log("Telefonnummeret må være et telefonnummer: ".$NUMBER);
+    die('Telefonnummeret må være et telefonnummer!');
+}
+// Sjekk at msg er en integer / trim whitespace.
+$MESSAGE = trim($MESSAGE);
+if (!is_numeric($MESSAGE)) {
+    svar('Koden du sendte ble dessverre ikke gjenkjent, dobbeltsjekk at tallet '.$MESSAGE
+        .' stemmer med tallet på nettsiden, og at det er et mellomrom mellom V og tallet.', $NUMBER);
+    validate_log('Bruker-ID må være et tall!');
+    die('Bruker-id må være et tall!');
+}
 
-## 
-function validerBruker($msg, $nummer) {
-	// Sjekk at nummeret er et fullstendig telefonnummer
-	if (!is_numeric($nummer) || (strlen($nummer) != 8)) {
-		// Systemfeil - logg og si fra til admins?
-		validate_log("Telefonnummeret må være et telefonnummer: ".$nummer);
-		die('Telefonnummeret må være et telefonnummer!');
-	}
-	// Sjekk at msg er en integer / trim whitespace.
-	$msg = trim($msg);
-	if (!is_numeric($msg)) {
-		svar('Koden du sendte ble dessverre ikke gjenkjent, dobbeltsjekk at tallet '.$msg
-			.' stemmer med tallet på nettsiden, og at det er et mellomrom mellom V og tallet.', $nummer);
-		validate_log('Bruker-ID må være et tall!');
-		die('Bruker-id må være et tall!');
-	}
-	
-	$sql = new SQLins('SMSValidation', array('phone' => $nummer, 'user_id' => $msg), 'ukmdelta');
-	$sql->add('validated', 1);
+$sql = new Insert(
+    'SMSValidation',
+    [
+        'phone' => $NUMBER,
+        'user_id' => $MESSAGE
+    ],
+    'ukmdelta'
+);
+$sql->add('validated', 1);
+$res = $sql->run();
+if ($res >= 1) {
+    // Done, everything okay.
+    // (1 or more affected row)
+    notifySupport('Deltaker med mobilnummer '.$NUMBER.' har sendt svar-SMS som ble mottatt korrekt. Valideringen er godkjent i databasen. Steg 2 av 3.', $NUMBER);
+    die();
+}
 
-	
-	$res = $sql->run();
-	if ($res >= 1) {
-		// Done, everything okay.
-		// (1 or more affected row)
-		notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS som ble mottatt korrekt. Valideringen er godkjent i databasen. Steg 2 av 3.', $nummer);
-		return;
-	}
-	if ($res == 0) {
-		// Ingen endringer - finnes det en validert bruker?
-		$sql = new SQL("SELECT COUNT(*) FROM SMSValidation WHERE `phone` = '#phone' AND `user_id` = '#u_id'", array('phone' => $nummer, 'u_id' => $msg), 'ukmdelta');
-		$res = $sql->run('field', 'COUNT(*)');
-		if ($res > 0) {
-			// Do nothing, already validated.
-			notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS. Godkjenning feilet fordi den allerede er godkjent i databasen. Brukeren får IKKE SMS tilbake om denne feilen. Har brukeren glemt å trykke på knappen "Trykk her når du har sendt meldingen", eller sendt flere meldinger? Steg 2 av 3.', $nummer);
-			validate_log("Allerede validert (".$nummer.")!");
-			die('Allerede validert.');
-		}
-		// Nei, i så fall svar at det oppsto en feil
-		else {
-			// Or reply to the user with an error
-			svar("Klarte ikke å godkjenne telefonnummeret - ta kontakt med support@ukm.no.", $nummer);
-			validate_log("Kunne ikke endre status til validert (".$nummer.")!");
-			notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS, men vi klarte ikke å endre status til godkjent i databasen. Brukeren har fått SMS om at det har skjedd en feil, og beskjed om å kontakte support. Steg 2 av 3.', $nummer);
-			die('Klarte ikke endre status.');
-		}
-	}
-	else {
-		#svar("Det oppsto en feil - ta kontakt med support@ukm.no", $nummer);
-		validate_log("Det oppsto en feil i MySQL for nummer ".$nummer.": ".$sql->error());
-		notifySupport('Deltaker med mobilnummer '.$nummer.' har sendt svar-SMS, men vi traff på en ukjent feil mens vi prøvde å godkjenne brukeren. Brukeren har IKKE fått SMS om at det har skjedd en feil, og lokalkontakt bør kanskje kontaktes? Steg 2 av 3.', $nummer);
-		die('Something went wrong!');
-	}
+if ($res == 0) {
+    // Ingen endringer - finnes det en validert bruker?
+    $sql = new Query(
+        "SELECT COUNT(*) 
+        FROM SMSValidation 
+        WHERE `phone` = '#phone' 
+        AND `user_id` = '#u_id'", 
+        [
+            'phone' => $NUMBER,
+            'u_id' => $MESSAGE
+        ],
+        'ukmdelta'
+    );
+    $res = $sql->getField();
+    if ($res > 0) {
+        // Do nothing, already validated.
+        notifySupport('Deltaker med mobilnummer '.$NUMBER.' har sendt svar-SMS. Godkjenning feilet fordi den allerede er godkjent i databasen. Brukeren får IKKE SMS tilbake om denne feilen. Har brukeren glemt å trykke på knappen "Trykk her når du har sendt meldingen", eller sendt flere meldinger? Steg 2 av 3.', $NUMBER);
+        validate_log("Allerede validert (".$NUMBER.")!");
+        die('Allerede validert.');
+    }
+    // Nei, i så fall svar at det oppsto en feil
+    else {
+        // Or reply to the user with an error
+        svar("Klarte ikke å godkjenne telefonnummeret - ta kontakt med support@ukm.no.", $NUMBER);
+        validate_log("Kunne ikke endre status til validert (".$NUMBER.")!");
+        notifySupport('Deltaker med mobilnummer '.$NUMBER.' har sendt svar-SMS, men vi klarte ikke å endre status til godkjent i databasen. Brukeren har fått SMS om at det har skjedd en feil, og beskjed om å kontakte support. Steg 2 av 3.', $NUMBER);
+        die('Klarte ikke endre status.');
+    }
+}
+else {
+    #svar("Det oppsto en feil - ta kontakt med support@ukm.no", $NUMBER);
+    validate_log("Det oppsto en feil i MySQL for nummer ".$NUMBER.": ".$sql->error());
+    notifySupport('Deltaker med mobilnummer '.$NUMBER.' har sendt svar-SMS, men vi traff på en ukjent feil mens vi prøvde å godkjenne brukeren. Brukeren har IKKE fått SMS om at det har skjedd en feil, og lokalkontakt bør kanskje kontaktes? Steg 2 av 3.', $NUMBER);
+    die('Something went wrong!');
 }
 
 function validate_log($message) {
@@ -75,7 +91,7 @@ function validate_log($message) {
 }
 
 function notifySupport($message, $phone) {
-	// Send e-post til support om at brukeren godkjennes i Deltasystemet.
+    // Send e-post til support om at brukeren godkjennes i Deltasystemet.
 	require_once('UKMconfig.inc.php');
 	require_once('UKM/mail.class.php');
 	$mail = new UKMmail();
@@ -85,6 +101,7 @@ function notifySupport($message, $phone) {
 		subject('Re: Manuell validering for '.$phone)->
 		message($message);
 	if('ukm.dev' == UKM_HOSTNAME) {
+        echo '<h2>SEND EMAIL to support@ukm.no FROM delta@'. UKM_HOSTNAME . ' WITH SUBJECT: Re: Manuell validering for '.$phone .'</h2><code>'. $message .'</code>';
 		error_log("UKMsms: Not sending email in dev due to timeouts!");
 	} else {
 		error_log("UKMsms: Sending reverse sms notification email.");
@@ -93,6 +110,10 @@ function notifySupport($message, $phone) {
 }
 
 function svar($message, $number) {
+    if( UKM_HOSTNAME == 'ukm.dev' ) {
+        echo 'SMS: '. $message .' TO '. $number .' FROM UKMNorge';
+        return;
+    }
 	$SMS = new SMS('UKM-brukervalidering', 'false');
 	$SMS->text($message)
 		->to($number)
