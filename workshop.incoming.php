@@ -24,8 +24,7 @@ function godkjenn($nummer, $melding) {
 	UKM_loader('sql');
 	$plid = new SQL("SELECT `pl_id`
 					FROM `smartukm_place`
-					WHERE `pl_kommune` = '123456789'
-					AND `pl_fylke` = '123456789'
+					WHERE `pl_owner_type` = 'land'
 					AND `season` = '#year'",
 					array('year' => date('Y')));
 	$plid = $plid->run('field','pl_id');
