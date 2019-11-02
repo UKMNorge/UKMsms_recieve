@@ -70,13 +70,31 @@ if ($res == 0) {
         validate_log("Allerede validert (".$NUMBER.")!");
         die('Allerede validert.');
     }
-    // Nei, i så fall svar at det oppsto en feil
+    // Nei, det finnes ingen validert bruker. Sjekk om koden finnes, i så fall svar at brukeren kanskje har skrevet feil nummer?
     else {
-        // Or reply to the user with an error
-        svar("Klarte ikke å godkjenne telefonnummeret - ta kontakt med support@ukm.no.", $NUMBER);
-        validate_log("Kunne ikke endre status til validert (".$NUMBER.")!");
-        notifySupport('Deltaker med mobilnummer '.$NUMBER.' har sendt svar-SMS, men vi klarte ikke å endre status til godkjent i databasen. Brukeren har fått SMS om at det har skjedd en feil, og beskjed om å kontakte support. Steg 2 av 3.', $NUMBER);
-        die('Klarte ikke endre status.');
+        $sql = new Query(
+            "SELECT *
+            FROM SMSValidation
+            WHERE `user_id` = '#u_id'",
+            [
+                'u_id' => $MESSAGE
+            ],
+            'ukmdelta'
+        );
+        $res = $sql->getArray();
+        if($res) {
+            // ID'en brukeren sendte finnes, men stemmer ikke med mobilnummeret de sendte meldinga fra. For ikke å ta fra de ansvaret helt (+ tåle tilfeldige meldinger), retter vi ikke opp dette her, men sier fra i stedet.
+            svar("Meldingen du sendte kom fram, men nummeret stemmer ikke med det du skrev inn. Feil nummer?", $NUMBER);
+           notifySupport("Kunne ikke endre status til validert fordi mobilnummeret ikke fantes i databasen. IDen var der, men ikke med dette mobilnummeret. Bruker har sannsynligvis skrevet feil mobil-nr. i Delta, og har fått beskjed om dette på SMS. Oppgitt nummer: ".$NUMBER.", lagret nummer: ".$res['phone'].".", $NUMBER);
+            die("Kunne ikke endre status til validert, fordi mobilnummeret ikke fantes i databasen med denne IDen.");
+        }
+        else {
+            // Dersom det ikke var dette som var feil - svar generisk
+            svar("Klarte ikke å godkjenne telefonnummeret - ta kontakt med support@ukm.no.", $NUMBER);
+            validate_log("Kunne ikke endre status til validert (".$NUMBER.")!");
+            notifySupport('Deltaker med mobilnummer '.$NUMBER.' har sendt svar-SMS, men vi klarte ikke å endre status til godkjent i databasen. Brukeren har fått SMS om at det har skjedd en feil, og beskjed om å kontakte support. Steg 2 av 3.', $NUMBER);
+            die('Klarte ikke endre status.');    
+        } 
     }
 }
 else {
@@ -120,4 +138,4 @@ function svar($message, $number) {
 		->from('UKMNorge')
 		->ok();
 }
-?>
+
