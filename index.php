@@ -15,6 +15,16 @@ if( 'ukm.dev' == UKM_HOSTNAME ) {
 
 require_once('UKM/sms.class.php');
 
+### Sikre oss at SMSen kommer fra Sveve - kun i prod
+if( 'ukm.dev' != UKM_HOSTNAME ) {
+	$source = $_GET['source'];
+	if($source != 'sveve') {
+		error_log("Innkommende SMS fra noen andre enn Sveve! IP: ".$_SERVER['REMOTE_ADDR']);
+		error_log("Verdier\n\tNumber:".$NUMBER."\n\tPrefix: ".$PREFIX."\n\tMessage: ".$MESSAGE);
+		die("Source is not Sveve! This incident will be logged.");
+	}
+}
+
 header('Cache-Control: no-store');
 
 switch($PREFIX) {
