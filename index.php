@@ -6,6 +6,8 @@ $PREFIX = strtolower($PREFIX[0]);
 $MESSAGE = substr( $_GET['msg'], strlen( $PREFIX ) );
 $NUMBER = $_GET['number'];
 
+header('Cache-Control: no-store');
+
 require_once('UKMconfig.inc.php');
 if( 'ukm.dev' == UKM_HOSTNAME ) {
 	#var_dump($PREFIX);
@@ -16,16 +18,19 @@ if( 'ukm.dev' == UKM_HOSTNAME ) {
 require_once('UKM/sms.class.php');
 
 ### Sikre oss at SMSen kommer fra Sveve - kun i prod
-if( 'ukm.dev' != UKM_HOSTNAME ) {
+if( 'ukm.dev' != UKM_HOSTNAME && defined('UKM_SVEVE_KEY')) {
 	$source = $_GET['source'];
-	if($source != 'sveve') {
+	if($source != UKM_SVEVE_KEY) {
 		error_log("Innkommende SMS fra noen andre enn Sveve! IP: ".$_SERVER['REMOTE_ADDR']);
 		error_log("Verdier\n\tNumber:".$NUMBER."\n\tPrefix: ".$PREFIX."\n\tMessage: ".$MESSAGE);
 		die("Source is not Sveve! This incident will be logged.");
 	}
 }
 
-header('Cache-Control: no-store');
+if( !defined( 'UKM_SVEVE_KEY' ) ) {
+	error_log("UKM_SVEVE_KEY not defined!");
+	die("Missing UKM_SVEVE_KEY in configuration.");
+}
 
 switch($PREFIX) {
 	## REGISTRER SOM AMBASSADØR
