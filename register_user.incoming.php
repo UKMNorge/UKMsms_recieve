@@ -85,7 +85,7 @@ if ($res == 0) {
         if($res) {
             // ID'en brukeren sendte finnes, men stemmer ikke med mobilnummeret de sendte meldinga fra. For ikke å ta fra de ansvaret helt (+ tåle tilfeldige meldinger), retter vi ikke opp dette her, men sier fra i stedet.
             svar("Meldingen du sendte kom fram, men nummeret stemmer ikke med det du skrev inn. Feil nummer?", $NUMBER);
-           notifySupport("Kunne ikke endre status til validert fordi mobilnummeret ikke fantes i databasen. IDen var der, men ikke med dette mobilnummeret. Bruker har sannsynligvis skrevet feil mobil-nr. i Delta, og har fått beskjed om dette på SMS. Oppgitt nummer: ".$NUMBER.", lagret nummer: ".$res['phone'].".", $NUMBER);
+           notifySupport("Kunne ikke endre status til validert fordi mobilnummeret ikke fantes i databasen. IDen var der, men ikke med dette mobilnummeret. Bruker har sannsynligvis skrevet feil mobil-nr. i Delta, og har fått beskjed om dette på SMS. Nummer som sendte SMS: ".$NUMBER.", oppgitt nummer: ".$res['phone'].".", $NUMBER);
             die("Kunne ikke endre status til validert, fordi mobilnummeret ikke fantes i databasen med denne IDen.");
         }
         else {
