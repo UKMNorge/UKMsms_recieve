@@ -1,6 +1,10 @@
 <?php
 
-require_once('UKM/sql.class.php');
+use UKMNorge\Database\SQL\Insert;
+use UKMNorge\Database\SQL\Query;
+use UKMNorge\Database\SQL\Update;
+
+require_once('UKM/Autoloader.php');
 require_once('UKM/sms.class.php');
 require_once('UKM/mail.class.php');
 
@@ -13,7 +17,7 @@ function valider($fra, $sms) {
 		die(valider_feilet($fra,$bid, 'Beklager, vi mangler noe info i meldingen. Sikker på at du skrev inn alt?'));
 
 	## SJEKK OM AVSENDER ER DEN VI SØKER
-	$qry = new SQL("SELECT `v_phone` FROM `smartukm_band_manualvalidate`
+	$qry = new Query("SELECT `v_phone` FROM `smartukm_band_manualvalidate`
 					WHERE `b_id` = '#bid'",
 					array('bid'=>$bid));
 	$avsender = $qry->run('field','v_phone');
@@ -24,7 +28,7 @@ function valider($fra, $sms) {
 	}
 	
 	## HENT INN VALIDERINGEN SOM VENTER	
-	$venter = new SQL("SELECT `b_id` FROM `smartukm_band_manualvalidate`
+	$venter = new Query("SELECT `b_id` FROM `smartukm_band_manualvalidate`
 					WHERE `b_id` = '#bid'
 					AND `v_phone` = '#phone'
 					AND `v_complete` = 'false'",
@@ -32,7 +36,7 @@ function valider($fra, $sms) {
 	$venter = $venter->run();
 	
 	## INGEN VENTER
-	if(SQL::numRows($venter)==0||!$venter) {
+	if(Query::numRows($venter)==0||!$venter) {
 		valider_logg($bid, 38);
 		valider_feilet($fra, $bid, 'Beklager, kan ikke finne noen innslag fra ditt nr som venter på validering');
 		die();
@@ -44,7 +48,7 @@ function valider($fra, $sms) {
 }
 
 function valider_logg($bid, $kode) {
-	$logg = new SQLins('ukmno_smartukm_log');
+	$logg = new Insert('ukmno_smartukm_log');
 	$logg->add('log_time',time());
 	$logg->add('log_b_id', $bid);
 	$logg->add('log_code', $kode);
@@ -123,14 +127,14 @@ function valider_ok($til,$bid, $mail) {
 
 function valider_really($bid, $fra) {
 	## OPPDATER INNSLAGET
-	$oppdater = new SQLins('smartukm_band', array('b_id'=>$bid));
+	$oppdater = new Update('smartukm_band', array('b_id'=>$bid));
 	$oppdater->add('b_status',1);
 	$oppdater->run();
 	## LOGG STATUS
 	valider_logg($bid, 37);
 	
 	## HENT E-POST TIL KONTAKTPERSON
-	$qry = new SQL("SELECT `p_email` FROM `smartukm_band` AS `b`
+	$qry = new Query("SELECT `p_email` FROM `smartukm_band` AS `b`
 					JOIN `smartukm_participant` AS `p` ON (`b`.`b_contact` = `p`.`p_id`)
 					WHERE `b`.`b_id` = '#bid'",
 					array('bid'=>$bid));
@@ -152,7 +156,7 @@ function valider_really($bid, $fra) {
 	valider_ok($fra,$bid, $mail);
 	
 	## OPPDATER MANUELL-SJEKKDATABASEN SÅ DEN IKKE TREFFER IGJEN
-	$opp = new SQLins('smartukm_band_manualvalidate',array('b_id'=>$bid,'v_phone'=>$fra,'v_complete'=>'false'));
+	$opp = new Update('smartukm_band_manualvalidate',array('b_id'=>$bid,'v_phone'=>$fra,'v_complete'=>'false'));
 	$opp->add('v_complete','true');
 	$opp->run();
 }

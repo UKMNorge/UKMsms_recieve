@@ -9,8 +9,8 @@
 // Definer konstanter før include av SQL-klassen
 #define('UKM_DB_NAME', 'ukmdelta_db');
 
-use UKMNorge\Database\SQL\Insert;
 use UKMNorge\Database\SQL\Query;
+use UKMNorge\Database\SQL\Update;
 
 ini_set('display_errors', true);
 
@@ -33,7 +33,7 @@ if (!is_numeric($MESSAGE)) {
     die('Bruker-id må være et tall!');
 }
 
-$sql = new Insert(
+$sql = new Update(
     'SMSValidation',
     [
         'phone' => $NUMBER,

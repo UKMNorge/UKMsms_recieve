@@ -1,9 +1,13 @@
 <?php
+
+use UKMNorge\Database\SQL\Insert;
+use UKMNorge\Database\SQL\Query;
+
 error_log( 'UKMSJEKK_WARN:'. $NUMBER );
-require_once('UKM/sql.class.php');
+require_once('UKM/Autoloader.php');
 
 # HVIS NUMMER ALLEREDE FINNES I DATABASEN
-$qry = new SQL("SELECT * FROM `ukm_sjekk` WHERE `phone` = '#mobile'", array('mobile' => $NUMBER));
+$qry = new Query("SELECT * FROM `ukm_sjekk` WHERE `phone` = '#mobile'", array('mobile' => $NUMBER));
 $res = $qry->run('array');
 if ($res) {
 	$url = 'http://delta.ukm.no/sjekk/'.$NUMBER.'/'.$res['hash'];
@@ -15,7 +19,7 @@ else {
 	$hash = substr($hash, 32, 8);
 
 	## Lagre mobilnummer og hash i databasen
-	$qry = new SQLins("ukm_sjekk");
+	$qry = new Insert("ukm_sjekk");
 	$qry->add('phone', $NUMBER);
 	$qry->add('hash', $hash);
 	$res = $qry->run();
